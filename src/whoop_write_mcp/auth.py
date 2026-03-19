@@ -118,7 +118,7 @@ async def get_whoop_client():
         expires_at=tokens.expires_at,
     )
 
-    def on_refresh(new_tokens):
+    async def on_refresh(new_tokens):
         save_tokens(StoredTokens(
             access_token=new_tokens.access_token,
             refresh_token=new_tokens.refresh_token,

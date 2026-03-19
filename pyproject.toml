@@ -23,7 +23,7 @@ dev = [
 ]
 
 [project.scripts]
-whoop-write-mcp = "whoop_write_mcp.server:main"
+whoop-write-mcp = "whoop_write_mcp.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
