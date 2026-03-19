@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 async def get_recovery(days: int = 1) -> dict:
     """get recent recovery scores."""
-    from whoop_mcp.auth import get_whoop_client
+    from whoop_write_mcp.auth import get_whoop_client
     client = await get_whoop_client()
     recoveries = await client.get_recovery()
     results = []
@@ -24,7 +24,7 @@ async def get_recovery(days: int = 1) -> dict:
 
 async def get_sleep(days: int = 1) -> dict:
     """get recent sleep data."""
-    from whoop_mcp.auth import get_whoop_client
+    from whoop_write_mcp.auth import get_whoop_client
     client = await get_whoop_client()
     sleeps = await client.get_sleep()
     results = []
@@ -39,7 +39,7 @@ async def get_sleep(days: int = 1) -> dict:
 
 async def get_cycles(days: int = 1) -> dict:
     """get recent strain/cycle data."""
-    from whoop_mcp.auth import get_whoop_client
+    from whoop_write_mcp.auth import get_whoop_client
     client = await get_whoop_client()
     cycles = await client.get_cycles()
     results = []
@@ -57,7 +57,7 @@ async def create_activity(
     start_time: str | None = None,
 ) -> dict:
     """log an activity to whoop."""
-    from whoop_mcp.auth import get_whoop_client
+    from whoop_write_mcp.auth import get_whoop_client
 
     if start_time:
         start = start_time
@@ -77,7 +77,7 @@ async def create_activity(
 
 async def delete_activity(activity_id: str, is_recovery: bool = False) -> dict:
     """delete an activity from whoop."""
-    from whoop_mcp.auth import get_whoop_client
+    from whoop_write_mcp.auth import get_whoop_client
     client = await get_whoop_client()
     await client.delete_activity(activity_id, is_recovery=is_recovery)
     return {"success": True, "deleted": activity_id}
@@ -85,7 +85,7 @@ async def delete_activity(activity_id: str, is_recovery: bool = False) -> dict:
 
 async def list_activities(limit: int = 5) -> dict:
     """list recent whoop activities."""
-    from whoop_mcp.auth import get_whoop_client
+    from whoop_write_mcp.auth import get_whoop_client
     client = await get_whoop_client()
     workouts = await client.get_workouts()
     activities = [
@@ -97,7 +97,7 @@ async def list_activities(limit: int = 5) -> dict:
 
 async def update_weight(weight_lbs: float) -> dict:
     """update body weight on whoop (converts lbs to kg)."""
-    from whoop_mcp.auth import get_whoop_client
+    from whoop_write_mcp.auth import get_whoop_client
     weight_kg = weight_lbs / 2.20462
     client = await get_whoop_client()
     await client.update_weight(weight_kg)
@@ -106,7 +106,7 @@ async def update_weight(weight_lbs: float) -> dict:
 
 async def set_alarm(time_str: str, enabled: bool = True) -> dict:
     """set or disable whoop alarm."""
-    from whoop_mcp.auth import get_whoop_client
+    from whoop_write_mcp.auth import get_whoop_client
     client = await get_whoop_client()
     await client.set_alarm(time_str, enabled=enabled)
     return {"success": True, "alarm_time": time_str, "enabled": enabled}

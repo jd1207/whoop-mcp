@@ -1,4 +1,4 @@
-# whoop-mcp
+# whoop-write-mcp
 
 MCP server for [Whoop](https://www.whoop.com/) — read biometrics, log activities, and manage your Whoop band from Claude.
 
@@ -22,13 +22,13 @@ Built on [whoop-write-api](https://github.com/jd1207/whoop-write-api) and the [M
 ### Step 1: Add the server
 
 ```bash
-claude mcp add -s user whoop -- uvx whoop-mcp
+claude mcp add -s user whoop -- uvx whoop-write-mcp
 ```
 
 ### Step 2: Authenticate
 
 ```bash
-whoop-mcp login
+whoop-write-mcp login
 ```
 
 Enter your Whoop email and password when prompted. Credentials are used once to get tokens, then discarded. Tokens are cached at `~/.whoop/tokens.json` and auto-refresh — you shouldn't need to login again.
@@ -47,7 +47,7 @@ Ask Claude things like:
 ### Alternative: env vars (skip the login step)
 
 ```bash
-claude mcp add -e WHOOP_EMAIL=you@example.com -e WHOOP_PASSWORD=yourpass -s user whoop -- uvx whoop-mcp
+claude mcp add -e WHOOP_EMAIL=you@example.com -e WHOOP_PASSWORD=yourpass -s user whoop -- uvx whoop-write-mcp
 ```
 
 Server auto-authenticates on first tool call. Useful for automation.
@@ -55,10 +55,10 @@ Server auto-authenticates on first tool call. Useful for automation.
 ### From source
 
 ```bash
-git clone https://github.com/jd1207/whoop-mcp.git
-cd whoop-mcp && pip install -e .
-claude mcp add -s user whoop -- whoop-mcp
-whoop-mcp login
+git clone https://github.com/jd1207/whoop-write-mcp.git
+cd whoop-write-mcp && pip install -e .
+claude mcp add -s user whoop -- whoop-write-mcp
+whoop-write-mcp login
 ```
 
 ## Managing
@@ -66,8 +66,8 @@ whoop-mcp login
 ```bash
 claude mcp list            # see registered servers
 claude mcp remove whoop    # unregister
-whoop-mcp status           # check auth state
-whoop-mcp logout           # remove cached tokens
+whoop-write-mcp status           # check auth state
+whoop-write-mcp logout           # remove cached tokens
 ```
 
 Or type `/mcp` inside Claude Code to manage connected servers.
@@ -76,14 +76,14 @@ Or type `/mcp` inside Claude Code to manage connected servers.
 
 1. First tool call checks for cached tokens at `~/.whoop/tokens.json`
 2. No tokens? Auto-authenticates from `WHOOP_EMAIL`/`WHOOP_PASSWORD` env vars if set
-3. No env vars? Returns a clear error: *"Run `whoop-mcp login` in your terminal"*
+3. No env vars? Returns a clear error: *"Run `whoop-write-mcp login` in your terminal"*
 4. Tokens cached (`0600` permissions), auto-refresh on expiry
 5. Password never stored on disk — only refresh tokens
 
 ## Architecture
 
 ```
-Claude Code  <--stdio-->  whoop-mcp  <--https-->  Whoop API
+Claude Code  <--stdio-->  whoop-write-mcp  <--https-->  Whoop API
                               |
                         ~/.whoop/tokens.json
 ```
@@ -91,8 +91,8 @@ Claude Code  <--stdio-->  whoop-mcp  <--https-->  Whoop API
 ## Development
 
 ```bash
-git clone https://github.com/jd1207/whoop-mcp.git
-cd whoop-mcp
+git clone https://github.com/jd1207/whoop-write-mcp.git
+cd whoop-write-mcp
 pip install -e ".[dev]"
 pytest
 ```

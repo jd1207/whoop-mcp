@@ -1,11 +1,11 @@
 """tests for token persistence."""
-from whoop_mcp.auth import StoredTokens, save_tokens, load_tokens, clear_tokens, tokens_expired
+from whoop_write_mcp.auth import StoredTokens, save_tokens, load_tokens, clear_tokens, tokens_expired
 import time
 
 
 def test_save_and_load_tokens(tmp_path, monkeypatch):
-    monkeypatch.setattr("whoop_mcp.auth.TOKEN_DIR", tmp_path)
-    monkeypatch.setattr("whoop_mcp.auth.TOKEN_FILE", tmp_path / "tokens.json")
+    monkeypatch.setattr("whoop_write_mcp.auth.TOKEN_DIR", tmp_path)
+    monkeypatch.setattr("whoop_write_mcp.auth.TOKEN_FILE", tmp_path / "tokens.json")
 
     tokens = StoredTokens(
         access_token="access-123",
@@ -21,13 +21,13 @@ def test_save_and_load_tokens(tmp_path, monkeypatch):
 
 
 def test_load_tokens_missing(tmp_path, monkeypatch):
-    monkeypatch.setattr("whoop_mcp.auth.TOKEN_FILE", tmp_path / "nope.json")
+    monkeypatch.setattr("whoop_write_mcp.auth.TOKEN_FILE", tmp_path / "nope.json")
     assert load_tokens() is None
 
 
 def test_clear_tokens(tmp_path, monkeypatch):
     token_file = tmp_path / "tokens.json"
-    monkeypatch.setattr("whoop_mcp.auth.TOKEN_FILE", token_file)
+    monkeypatch.setattr("whoop_write_mcp.auth.TOKEN_FILE", token_file)
     token_file.write_text("{}")
     clear_tokens()
     assert not token_file.exists()

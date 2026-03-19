@@ -3,9 +3,9 @@ requires = ["setuptools>=68.0", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "whoop-mcp"
+name = "whoop-write-mcp"
 version = "0.1.0"
-description = "MCP server for Whoop — read biometrics, log activities, manage journal via Claude"
+description = "MCP server for Whoop with write support — log activities, set alarms, update weight, read biometrics"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
@@ -23,7 +23,7 @@ dev = [
 ]
 
 [project.scripts]
-whoop-mcp = "whoop_mcp.server:main"
+whoop-write-mcp = "whoop_write_mcp.server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
