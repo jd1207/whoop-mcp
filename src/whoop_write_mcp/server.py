@@ -24,7 +24,7 @@ async def get_recovery(days: int = 1) -> str:
         days: Number of days of recovery data to return (default 1)
     """
     import json
-    from whoop_mcp.tools import get_recovery as _get_recovery
+    from whoop_write_mcp.tools import get_recovery as _get_recovery
     result = await _get_recovery(days)
     return json.dumps(result)
 
@@ -37,7 +37,7 @@ async def get_sleep(days: int = 1) -> str:
         days: Number of days of sleep data to return (default 1)
     """
     import json
-    from whoop_mcp.tools import get_sleep as _get_sleep
+    from whoop_write_mcp.tools import get_sleep as _get_sleep
     result = await _get_sleep(days)
     return json.dumps(result)
 
@@ -50,7 +50,7 @@ async def get_strain(days: int = 1) -> str:
         days: Number of days of strain data to return (default 1)
     """
     import json
-    from whoop_mcp.tools import get_cycles as _get_cycles
+    from whoop_write_mcp.tools import get_cycles as _get_cycles
     result = await _get_cycles(days)
     return json.dumps(result)
 
@@ -71,7 +71,7 @@ async def create_activity(
         start_time: Optional ISO 8601 start time. If omitted, assumes activity just ended.
     """
     import json
-    from whoop_mcp.tools import create_activity as _create
+    from whoop_write_mcp.tools import create_activity as _create
     result = await _create(activity_type, duration_minutes, start_time)
     return json.dumps(result)
 
@@ -85,7 +85,7 @@ async def delete_activity(activity_id: str, is_recovery: bool = False) -> str:
         is_recovery: Whether this is a recovery activity (default false)
     """
     import json
-    from whoop_mcp.tools import delete_activity as _delete
+    from whoop_write_mcp.tools import delete_activity as _delete
     result = await _delete(activity_id, is_recovery)
     return json.dumps(result)
 
@@ -98,7 +98,7 @@ async def list_activities(limit: int = 5) -> str:
         limit: Maximum number of activities to return (default 5)
     """
     import json
-    from whoop_mcp.tools import list_activities as _list
+    from whoop_write_mcp.tools import list_activities as _list
     result = await _list(limit)
     return json.dumps(result)
 
@@ -111,7 +111,7 @@ async def update_weight(weight_lbs: float) -> str:
         weight_lbs: Body weight in pounds
     """
     import json
-    from whoop_mcp.tools import update_weight as _update
+    from whoop_write_mcp.tools import update_weight as _update
     result = await _update(weight_lbs)
     return json.dumps(result)
 
@@ -125,7 +125,7 @@ async def set_alarm(time_str: str, enabled: bool = True) -> str:
         enabled: Whether the alarm should be enabled (default true)
     """
     import json
-    from whoop_mcp.tools import set_alarm as _set
+    from whoop_write_mcp.tools import set_alarm as _set
     result = await _set(time_str, enabled)
     return json.dumps(result)
 
@@ -138,7 +138,7 @@ def main():
         _handle_login()
         return
     if len(sys.argv) > 1 and sys.argv[1] == "logout":
-        from whoop_mcp.auth import clear_tokens
+        from whoop_write_mcp.auth import clear_tokens
         clear_tokens()
         print("Logged out. Tokens removed.")
         return
@@ -163,13 +163,13 @@ def _handle_login():
 
 
 async def _do_login(email: str, password: str):
-    from whoop_mcp.auth import login
+    from whoop_write_mcp.auth import login
     return await login(email, password)
 
 
 def _handle_status():
     """check auth status."""
-    from whoop_mcp.auth import load_tokens, tokens_expired
+    from whoop_write_mcp.auth import load_tokens, tokens_expired
     tokens = load_tokens()
     if not tokens:
         print("Not logged in. Run: whoop-mcp login")
