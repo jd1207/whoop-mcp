@@ -70,9 +70,10 @@ async def _auto_login_from_env() -> StoredTokens:
     password = os.environ.get("WHOOP_PASSWORD", "")
     if not email or not password:
         raise RuntimeError(
-            "not logged in — either:\n"
-            "  1. Set WHOOP_EMAIL and WHOOP_PASSWORD in your MCP server env config\n"
-            "  2. Run: whoop-mcp login"
+            "Whoop not connected. Run this in your terminal:\n\n"
+            "  whoop-mcp login\n\n"
+            "Or pass credentials via env vars when adding the server:\n"
+            "  claude mcp add -e WHOOP_EMAIL=... -e WHOOP_PASSWORD=... -s user whoop -- uvx whoop-mcp"
         )
     logger.info("auto-login from env vars")
     return await login(email, password)
