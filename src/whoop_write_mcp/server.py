@@ -7,11 +7,7 @@ from mcp.server.fastmcp import FastMCP
 
 logger = logging.getLogger(__name__)
 
-mcp = FastMCP(
-    "Whoop",
-    version="0.1.0",
-    description="Read biometrics, log activities, and manage your Whoop from Claude.",
-)
+mcp = FastMCP("Whoop")
 
 
 # -- read tools --
@@ -172,10 +168,10 @@ def _handle_status():
     from whoop_write_mcp.auth import load_tokens, tokens_expired
     tokens = load_tokens()
     if not tokens:
-        print("Not logged in. Run: whoop-mcp login")
+        print("Not logged in. Run: whoop-write-mcp login")
         return
     if tokens_expired(tokens):
-        print("Token expired. Run: whoop-mcp login")
+        print("Token expired. Run: whoop-write-mcp login")
     else:
         import time
         remaining = int(tokens.expires_at - time.time())
