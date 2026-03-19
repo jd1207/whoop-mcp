@@ -1,6 +1,7 @@
 """token persistence and refresh for whoop authentication."""
 from __future__ import annotations
 import json
+import os
 import time
 import logging
 from pathlib import Path
@@ -24,7 +25,6 @@ def save_tokens(tokens: StoredTokens) -> None:
     TOKEN_DIR.mkdir(parents=True, exist_ok=True)
     TOKEN_FILE.write_text(json.dumps(asdict(tokens)))
     TOKEN_FILE.chmod(0o600)
-    logger.info("tokens saved to %s", TOKEN_FILE)
 
 
 def load_tokens() -> StoredTokens | None:
@@ -64,24 +64,47 @@ async def login(email: str, password: str) -> StoredTokens:
     return stored
 
 
+async def _auto_login_from_env() -> StoredTokens:
+    """auto-login using WHOOP_EMAIL and WHOOP_PASSWORD env vars."""
+    email = os.environ.get("WHOOP_EMAIL", "")
+    password = os.environ.get("WHOOP_PASSWORD", "")
+    if not email or not password:
+        raise RuntimeError(
+            "not logged in — either:\n"
+            "  1. Set WHOOP_EMAIL and WHOOP_PASSWORD in your MCP server env config\n"
+            "  2. Run: whoop-mcp login"
+        )
+    logger.info("auto-login from env vars")
+    return await login(email, password)
+
+
 async def get_fresh_tokens() -> StoredTokens:
-    """load tokens and refresh if expired."""
+    """load tokens, refresh if expired, auto-login from env if no tokens."""
     tokens = load_tokens()
+
+    # no tokens on disk — try auto-login from env
     if not tokens:
-        raise RuntimeError("not logged in — run: whoop-mcp login")
+        return await _auto_login_from_env()
+
+    # tokens valid — use them
     if not tokens_expired(tokens):
         return tokens
-    # refresh
-    from whoop import CognitoAuth
-    auth = CognitoAuth()
-    token_set = await auth.refresh(tokens.refresh_token)
-    refreshed = StoredTokens(
-        access_token=token_set.access_token,
-        refresh_token=token_set.refresh_token,
-        expires_at=token_set.expires_at,
-    )
-    save_tokens(refreshed)
-    return refreshed
+
+    # expired — try refresh first
+    try:
+        from whoop import CognitoAuth
+        auth = CognitoAuth()
+        token_set = await auth.refresh(tokens.refresh_token)
+        refreshed = StoredTokens(
+            access_token=token_set.access_token,
+            refresh_token=token_set.refresh_token,
+            expires_at=token_set.expires_at,
+        )
+        save_tokens(refreshed)
+        return refreshed
+    except Exception:
+        logger.info("refresh failed, attempting re-login from env")
+        return await _auto_login_from_env()
 
 
 async def get_whoop_client():
