@@ -17,79 +17,62 @@ Built on [whoop-write-api](https://github.com/jd1207/whoop-write-api) and the [M
 | `update_weight` | Update body weight (lbs, converted to kg) |
 | `set_alarm` | Set or disable Whoop alarm |
 
-## Quick Start
-
-### 1. Install
+## Connect to Claude Code
 
 ```bash
-pip install whoop-mcp
+claude mcp add -e WHOOP_EMAIL=you@example.com -e WHOOP_PASSWORD=yourpass -s user whoop -- uvx whoop-mcp
 ```
 
-Or from source:
+That's it. The `-s user` flag makes it available across all projects. Ask Claude: *"What's my recovery today?"*
+
+The server auto-authenticates on first tool call, caches tokens at `~/.whoop/tokens.json`, and refreshes automatically. Your password is used once to get tokens, never stored on disk.
+
+### From source
 
 ```bash
 git clone https://github.com/jd1207/whoop-mcp.git
-cd whoop-mcp
-pip install -e .
+cd whoop-mcp && pip install -e .
+claude mcp add -e WHOOP_EMAIL=you@example.com -e WHOOP_PASSWORD=yourpass -s user whoop -- whoop-mcp
 ```
 
-### 2. Add to Claude Code
+### Alternative: interactive login
 
-Add to `~/.claude/settings.json` with your Whoop credentials as env vars:
+If you prefer not to pass credentials in the command:
 
-```json
-{
-  "mcpServers": {
-    "whoop": {
-      "command": "whoop-mcp",
-      "env": {
-        "WHOOP_EMAIL": "your-whoop-email@example.com",
-        "WHOOP_PASSWORD": "your-whoop-password"
-      }
-    }
-  }
-}
+```bash
+whoop-mcp login
+claude mcp add -s user whoop -- uvx whoop-mcp
 ```
 
-That's it. The server auto-authenticates on first use, caches tokens at `~/.whoop/tokens.json`, and refreshes automatically. Your password is only used once to get tokens, then the server uses refresh tokens going forward.
+## Usage
 
-### 3. Use
+Once connected, ask Claude things like:
 
-Ask Claude things like:
 - "What's my recovery today?"
 - "Log a 20-minute sauna session"
 - "Set my alarm for 7:30 AM"
 - "How did I sleep last night?"
 - "Update my weight to 255 lbs"
+- "Delete my last activity"
 
-## Alternative: CLI Login
-
-If you prefer not to put credentials in the config file:
+## Managing
 
 ```bash
-whoop-mcp login      # interactive prompt for email/password
-whoop-mcp status     # check auth state
-whoop-mcp logout     # remove stored tokens
+claude mcp list            # see registered servers
+claude mcp remove whoop    # unregister
+whoop-mcp status           # check auth state
+whoop-mcp logout           # remove cached tokens
 ```
 
-Then use a simpler config without env vars:
-
-```json
-{
-  "mcpServers": {
-    "whoop": {
-      "command": "whoop-mcp"
-    }
-  }
-}
-```
+Or type `/mcp` inside Claude Code to manage connected servers.
 
 ## How Auth Works
 
-1. On first tool call, the server checks for cached tokens at `~/.whoop/tokens.json`
-2. If no tokens: auto-authenticates using `WHOOP_EMAIL`/`WHOOP_PASSWORD` env vars (or fails with a helpful error if not set)
-3. Tokens are cached with `0600` permissions and auto-refresh when expired
-4. Your password is never stored — only the OAuth-like refresh token
+1. First tool call checks for cached tokens at `~/.whoop/tokens.json`
+2. No tokens? Auto-authenticates using `WHOOP_EMAIL`/`WHOOP_PASSWORD` env vars
+3. Tokens cached (`0600` permissions), auto-refresh on expiry
+4. If refresh fails, re-authenticates from env vars
+5. Password never stored on disk — only refresh tokens
 
 ## Architecture
 
@@ -98,10 +81,6 @@ Claude Code  <--stdio-->  whoop-mcp  <--https-->  Whoop API
                               |
                         ~/.whoop/tokens.json
 ```
-
-- **Transport:** stdio (Claude Code launches the server as a subprocess)
-- **Auth:** File-based token persistence with auto-refresh, auto-login from env vars
-- **API:** [whoop-write-api](https://github.com/jd1207/whoop-write-api) v0.4+ for all Whoop operations
 
 ## Development
 
